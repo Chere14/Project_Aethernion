@@ -1,4 +1,4 @@
 # Mini-2D-Game
 
-## Informații legate de cum funcționează jocul
+## How does the game work.
 
