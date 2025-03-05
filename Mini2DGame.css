@@ -1,5 +1,44 @@
 body {
-    background-color: #dbdbdb;  /* Optional: Base background color */
+    display: flex;
     margin: 0;
-    height: 100vh;  /* Fill the entire screen */
-  }
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.container {
+    position: relative;
+}
+
+.hexagon {
+    width: 100px;
+    height: 60px;
+    background: #9980FA;
+    position: relative;
+}
+
+.hexagon:before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-bottom: 30px solid #9980FA;
+}
+
+.hexagon:after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-top: 30px solid #9980FA;
+}
