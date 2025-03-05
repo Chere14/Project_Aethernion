@@ -1,5 +1,7 @@
 # Mini-2D-Game
 
+Survival game with multiple spawning creatures
+
 ## How does the game work.
 
 - 4 types of characters: hero, enemyMelee, enemyRange, enemyBoss.
