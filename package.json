@@ -1,0 +1,26 @@
+{
+  "name": "mini-2d-game",
+  "version": "1.0.0",
+  "description": "Survival game with multiple spawning creatures",
+  "main": "Mini2DGame.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chere14/Mini-2D-Game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chere14/Mini-2D-Game/issues"
+  },
+  "homepage": "https://github.com/Chere14/Mini-2D-Game#readme",
+  "dependencies": {
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "vite": "^6.2.1"
+  }
+}

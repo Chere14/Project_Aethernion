@@ -1,12 +1,20 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d')
 
-canvas.width = 2400;
-canvas.height = 1200;
 canvas.style.background = '#91AC8F';
 canvas.style.border = '2px solid white';
 canvas.style.borderRadius = '10px';
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.95;
+    canvas.height = window.innerHeight * 0.9;
+}
+
+resizeCanvas();
+
+window.addEventListener("resize", resizeCanvas);
+
+//Right Click Movement
 document.addEventListener("contextmenu", function (event) {
     event.preventDefault(); // Prevent right-click menu
 
@@ -23,7 +31,7 @@ document.addEventListener("contextmenu", function (event) {
     // Calculate distance
     let distance = Math.hypot(targetX - currentX, targetY - currentY);
 
-    // Set constant speed (adjust as needed)
+    // Set constant speed
     let speed = 0.3; // Pixels per millisecond
     let duration = distance / speed; // Time = Distance / Speed
 
@@ -31,4 +39,4 @@ document.addEventListener("contextmenu", function (event) {
     hero.style.transitionDuration = `${duration}ms`;
     hero.style.left = `${targetX}px`;
     hero.style.top = `${targetY}px`;
-});
+});  
