@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export class World extends THREE.Mesh {
+export class World extends THREE.Group {
     #objectMap = new Map();
 
     constructor() {
@@ -11,7 +11,7 @@ export class World extends THREE.Mesh {
         this.treeCount = 600; 
         this.rockCount = 400; 
         this.bushCount = 300; 
-        this.edgeMargin = 3; // Prevent objects from spawning too close to the edges
+        this.edgeMargin = 2; // Prevent objects from spawning too close to the edges
 
         this.trees = new THREE.Group();
         this.add(this.trees);
