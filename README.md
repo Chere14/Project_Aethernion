@@ -1,4 +1,4 @@
-# Mini-2D-Game
+# Project Aethernion
 
 Survival game with multiple spawning creatures
 
