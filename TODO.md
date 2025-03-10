@@ -1,12 +1,13 @@
 # To Do List
 
-- [ ] World
-    - [ ] Terrain
-    - [ ] Rocks
+- [X] World
+    - [X] Terrain
+    - [X] Trees
+    - [X] Rocks
 
 - [ ] Player Character
     - [ ] Create a character
-    - [ ] WASD sontrols
+    - [ ] WASD controls
     - [ ] Navigation 
 
 - [ ] Enemies
