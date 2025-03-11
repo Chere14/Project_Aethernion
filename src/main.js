@@ -46,7 +46,7 @@ scene.add(ambientLight);
 
 // Camera Update Function
 function updateCamera() {
-    const targetPosition = new THREE.Vector3(character.position.x, 25, character.position.z + 20); // camera distance when character is moving
+    const targetPosition = new THREE.Vector3(character.position.x, 20, character.position.z + 20); // camera distance when character is moving
     camera.position.lerp(targetPosition, 0.1); 
     camera.lookAt(character.position.x, character.position.y, character.position.z);
 }

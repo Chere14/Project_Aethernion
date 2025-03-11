@@ -13,6 +13,7 @@ export class World extends THREE.Group {
         this.bushCount = 300;
         this.edgeMargin = 2; // Prevent objects from spawning too close to edges
         this.minDistance = 2; // Minimum distance between objects
+        this.safeRadius = 3; // Safe zone radius around the origin to prevent objects from blocking the character
 
         this.trees = new THREE.Group();
         this.rocks = new THREE.Group();
@@ -58,11 +59,22 @@ export class World extends THREE.Group {
     }
 
     getRandomPosition() {
-        return new THREE.Vector3(
-            THREE.MathUtils.randFloat(-this.width / 2 + this.edgeMargin, this.width / 2 - this.edgeMargin),
-            0,
-            THREE.MathUtils.randFloat(-this.height / 2 + this.edgeMargin, this.height / 2 - this.edgeMargin)
-        );
+        let position;
+        let attempts = 0;
+        do {
+            position = new THREE.Vector3(
+                THREE.MathUtils.randFloat(-this.width / 2 + this.edgeMargin, this.width / 2 - this.edgeMargin),
+                0,
+                THREE.MathUtils.randFloat(-this.height / 2 + this.edgeMargin, this.height / 2 - this.edgeMargin)
+            );
+            attempts++;
+        } while (this.isInSafeZone(position) && attempts < 100);
+
+        return position;
+    }
+
+    isInSafeZone(position) {
+        return position.length() < this.safeRadius;
     }
 
     isValidPosition(newPos, minDist) {
@@ -78,7 +90,7 @@ export class World extends THREE.Group {
             do {
                 position = this.getRandomPosition();
                 attempts++;
-            } while (!this.isValidPosition(position, this.minDistance) && attempts < 100);
+            } while ((!this.isValidPosition(position, this.minDistance) || this.isInSafeZone(position)) && attempts < 100);
 
             if (attempts >= 100) continue; // Avoid infinite loops
 
