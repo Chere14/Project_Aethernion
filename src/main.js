@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { World } from './world';
-import { Character } from './character.js';
+import { Hero } from './character.js';
 
 // GUI and Stats
 const gui = new GUI();
@@ -32,7 +32,7 @@ const world = new World();
 scene.add(world);
 
 // Character
-const character = new Character(world, camera); 
+const character = new Hero(world, camera); 
 scene.add(character);
 
 // Lighting

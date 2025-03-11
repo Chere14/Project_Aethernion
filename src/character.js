@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export class Character extends THREE.Group {
+export class Hero extends THREE.Group {
     constructor(world, camera) {
         super();
         this.world = world;
@@ -60,31 +60,41 @@ export class Character extends THREE.Group {
             console.error('Camera is not assigned to the character');
             return;
         }
-
+    
         const cameraDirection = new THREE.Vector3();
         this.camera.getWorldDirection(cameraDirection);
         cameraDirection.y = 0;
         cameraDirection.normalize();
-
+    
         const rightDirection = new THREE.Vector3().crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0)).normalize();
-
+    
         this.velocity.set(0, 0, 0);
-
+    
         if (this.keys.w) this.velocity.add(cameraDirection);
         if (this.keys.s) this.velocity.sub(cameraDirection);
         if (this.keys.a) this.velocity.sub(rightDirection);
         if (this.keys.d) this.velocity.add(rightDirection);
-
+    
         if (this.velocity.length() > 0) {
             this.velocity.normalize().multiplyScalar(this.speed);
+    
+            // Compute new rotation angle
+            const angle = Math.atan2(this.velocity.x, this.velocity.z);
+    
+            // Create target quaternion
+            const targetQuaternion = new THREE.Quaternion();
+            targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+    
+            // Use quaternion slerp for smooth and shortest rotation
+            this.quaternion.slerp(targetQuaternion, 0.2);
         }
-
+    
         const newPosition = this.position.clone().add(this.velocity);
-
+    
         if (!this.checkCollision(newPosition)) {
             this.position.copy(newPosition);
         }
-    }
+    }    
 
     checkCollision(newPosition) {
         const { width, height, edgeMargin, trees, rocks, bushes } = this.world;
