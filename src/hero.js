@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Weapon } from './weapon';
 
 export class Hero extends THREE.Group {
     constructor(world, camera) {
@@ -13,6 +14,12 @@ export class Hero extends THREE.Group {
 
         top.position.y = 1;
         bottom.position.y = -1;
+
+        // Weapon 
+        this.weapon = new Weapon(); 
+        this.add(body, top, bottom, this.weapon);
+
+        this.rotation.y = Math.PI;
 
         // Create shoulder armor boxes
         const armorMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });

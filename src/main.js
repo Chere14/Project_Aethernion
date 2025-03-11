@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { World } from './world';
-import { Hero } from './character.js';
+import { Hero } from './hero.js';
 
 // GUI and Stats
 const gui = new GUI();
@@ -19,7 +19,7 @@ document.body.appendChild(renderer.domElement);
 // Scene
 const scene = new THREE.Scene();
 
-// Camera Setup (closer to the character)
+// Camera Setup (closer to the hero)
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(15, 15, 15); //initial camera position
 
@@ -31,9 +31,9 @@ controls.enabled = false; // Disable manual control
 const world = new World();
 scene.add(world);
 
-// Character
-const character = new Hero(world, camera); 
-scene.add(character);
+// Hero
+const hero = new Hero(world, camera);
+scene.add(hero);
 
 // Lighting
 const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
@@ -46,14 +46,14 @@ scene.add(ambientLight);
 
 // Camera Update Function
 function updateCamera() {
-    const targetPosition = new THREE.Vector3(character.position.x, 20, character.position.z + 20); // camera distance when character is moving
+    const targetPosition = new THREE.Vector3(hero.position.x, 20, hero.position.z + 20); // camera distance when character is moving
     camera.position.lerp(targetPosition, 0.1); 
-    camera.lookAt(character.position.x, character.position.y, character.position.z);
+    camera.lookAt(hero.position.x, hero.position.y, hero.position.z);
 }
 
 // Animation Loop
 function animate() {
-    character.update(); 
+    hero.update(); 
     updateCamera(); 
     renderer.render(scene, camera);
     stats.update();
