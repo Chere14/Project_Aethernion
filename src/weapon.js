@@ -10,7 +10,7 @@ export class Weapon extends THREE.Group {
         this.weaponMesh = new THREE.Mesh(weaponGeometry, weaponMaterial);
 
         // Position of the weapon
-        this.weaponMesh.position.set(0, 0.5, -0.6); 
+        this.weaponMesh.position.set(0, 0.5, -0.65); 
         this.weaponMesh.rotation.set(0, 0, Math.PI / 6); 
 
         this.add(this.weaponMesh);
