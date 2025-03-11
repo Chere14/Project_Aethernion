@@ -5,10 +5,10 @@
     - [X] Trees
     - [X] Rocks
 
-- [ ] Player Character
-    - [ ] Create a character
-    - [ ] WASD controls
-    - [ ] Navigation 
+- [X] Player Character
+    - [X] Create a character
+    - [X] WASD controls
+    - [X] Navigation 
 
 - [ ] Enemies
  - [ ] Create the enemies
