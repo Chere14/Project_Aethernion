@@ -77,22 +77,26 @@ import * as THREE from 'three';
      }
  
      checkCollision(newPosition) {
-         const halfWidth = this.world.width / 2 - this.world.edgeMargin;
-         const halfHeight = this.world.height / 2 - this.world.edgeMargin;
- 
-         // Prevent moving outside the world bounds
-         if (newPosition.x < -halfWidth || newPosition.x > halfWidth ||
-             newPosition.z < -halfHeight || newPosition.z > halfHeight) {
-             return true;
-         }
- 
-         // Prevent moving into objects
-         for (let obj of [...this.world.trees.children, ...this.world.rocks.children, ...this.world.bushes.children]) {
-             if (newPosition.distanceTo(obj.position) < 1) {
-                 return true;
-             }
-         }
- 
-         return false;
-     }
+        const { width, height, edgeMargin, trees, rocks, bushes } = this.world;
+        const halfWidth = width / 2 - edgeMargin;
+        const halfHeight = height / 2 - edgeMargin;
+    
+        // Prevent moving outside the world bounds
+        if (Math.abs(newPosition.x) > halfWidth || Math.abs(newPosition.z) > halfHeight) {
+            return true;
+        }
+    
+        // Character bounding sphere radius
+        const characterRadius = 0.5;
+        const objectsToCheck = [
+            { group: trees, radius: 0.6 },
+            { group: rocks, radius: 0.9 },
+            { group: bushes, radius: 0.55 }
+        ];
+    
+        // Check collisions with objects
+        return objectsToCheck.some(({ group, radius }) => 
+            group.children.some(obj => newPosition.distanceTo(obj.position) < characterRadius + radius)
+        );
+    }
  }
