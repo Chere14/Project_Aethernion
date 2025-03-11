@@ -11,7 +11,7 @@
     - [X] Navigation 
 
 - [ ] Enemies
- - [ ] Create the enemies
+    - [ ] Create the enemies
 
 - [ ] Combat
 
