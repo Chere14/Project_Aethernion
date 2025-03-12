@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import { Weapon } from './weapon.js';
 import { checkCollision } from './collision.js';
+import { HeroAttack } from '../attacks/heroAttack.js'; // Import HeroAttack
 
 export class Hero extends THREE.Group {
     constructor(world, camera) {
         super();
         this.world = world;
-        this.camera = camera; 
+        this.camera = camera;
 
         const material = new THREE.MeshStandardMaterial({ color: 0xffaa00 });
         const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2, 12), material);
@@ -17,10 +18,13 @@ export class Hero extends THREE.Group {
         bottom.position.y = -1;
 
         this.weapon = new Weapon();
+        this.weaponDrawn = false; // Track if the weapon is in hand
         this.attachWeaponToBack();
 
         this.add(body, top, bottom, this.weapon);
-         
+        
+        // Initialize the attack controller
+        this.heroAttack = new HeroAttack(this); // Pass hero instead of just weapon
 
         // Shoulder armor boxes
         const armorMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
@@ -41,8 +45,7 @@ export class Hero extends THREE.Group {
         this.handR.position.set(-0.8, -0.15, 0);
         
         this.add(body, top, bottom, this.shoulderArmorL, this.shoulderArmorR, this.handL, this.handR);
-        this.position.set(0, 1, 0)
-        //Rotation of all geometry that 
+        this.position.set(0, 1, 0);
         this.rotation.y = Math.PI;
 
         // Movement settings
@@ -51,9 +54,9 @@ export class Hero extends THREE.Group {
         this.keys = { w: false, a: false, s: false, d: false };
 
         // Animation properties
-        this.shoulderAnimationTime = 0; // Tracks time for shoulder movement
-        this.shoulderAmplitude = 0.08;  // Maximum movement up/down
-        this.shoulderFrequency = 0.08;     // Speed of movement (higher = faster)
+        this.shoulderAnimationTime = 0;
+        this.shoulderAmplitude = 0.08;
+        this.shoulderFrequency = 0.08;
 
         this.initControls();
     }
@@ -61,6 +64,18 @@ export class Hero extends THREE.Group {
     initControls() {
         window.addEventListener('keydown', (e) => this.handleKey(e, true));
         window.addEventListener('keyup', (e) => this.handleKey(e, false));
+        
+        // Spacebar now triggers weapon draw + attack
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                if (!this.weaponDrawn) {
+                    this.attachWeaponToHand(); // Draw weapon automatically
+                }
+                this.heroAttack.startSwing(); // Attack after weapon is positioned
+            }
+        });
+
+        // Toggle weapon manually with Z key
         window.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'z') {
                 this.toggleWeapon();
@@ -85,12 +100,25 @@ export class Hero extends THREE.Group {
     }
 
     attachWeaponToBack() {
+        this.weaponDrawn = false;
         this.weapon.position.set(0, 0.8, -0.8);
         this.weapon.rotation.set(0, 0, 20 * (Math.PI / 180));
     }
 
     attachWeaponToHand() {
-        this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
+        this.weaponDrawn = true;
+
+        // Ensure weapon is positioned relative to the right hand
+        const handPosition = this.handR.position.clone();
+
+        const offsetX = 0; 
+        const offsetY = 0.1; 
+        const offsetZ = 0.2; 
+
+        // Apply these offsets to the weapon position relative to the hand
+        this.weapon.position.set(handPosition.x + offsetX, handPosition.y + offsetY, handPosition.z + offsetZ);
+
+        // Reset the weapon's rotation to make sure it is aligned correctly when drawn
         this.weapon.rotation.set(Math.PI / 2, Math.PI / 2, 5 * Math.PI / 6);
     }
 
@@ -101,6 +129,7 @@ export class Hero extends THREE.Group {
         }
 
         if (this.weaponDrawn) {
+            // Update the position of the weapon relative to the right hand while in motion
             this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
         }
     
