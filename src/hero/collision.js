@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
 // Check collision between hero and world objects
-export function checkCollision(newPosition, world) {
-    const { width, height, edgeMargin, trees, rocks, bushes } = world;
+export function checkCollision(newPosition, world, heroScale = 1) {
+    const { width, height, edgeMargin, trees, rocks, bushes, enemies } = world;
     const halfWidth = width / 2 - edgeMargin;
     const halfHeight = height / 2 - edgeMargin;
 
@@ -11,35 +11,36 @@ export function checkCollision(newPosition, world) {
         return true;
     }
 
-    // Define bounding sphere radii based on object scales
-    const bodyRadius = 0.5;
-    const shoulderRadius = 0.25;
-    const handRadius = 0.15;
+    // Hero body parts scaled dynamically
+    const bodyRadius = 0.5 * heroScale;
+    const shoulderRadius = 0.25 * heroScale;
+    const handRadius = 0.15 * heroScale;
 
-    // Positions of additional body parts
-    const shoulderLPos = new THREE.Vector3(newPosition.x - 0.7, newPosition.y + 0.4, newPosition.z);
-    const shoulderRPos = new THREE.Vector3(newPosition.x + 0.7, newPosition.y + 0.4, newPosition.z);
-    const handLPos = new THREE.Vector3(newPosition.x - 0.7, newPosition.y - 0.1, newPosition.z);
-    const handRPos = new THREE.Vector3(newPosition.x + 0.7, newPosition.y - 0.1, newPosition.z);
+    // Hero body part positions
+    const shoulderLPos = new THREE.Vector3(newPosition.x - 0.7 * heroScale, newPosition.y + 0.4 * heroScale, newPosition.z);
+    const shoulderRPos = new THREE.Vector3(newPosition.x + 0.7 * heroScale, newPosition.y + 0.4 * heroScale, newPosition.z);
+    const handLPos = new THREE.Vector3(newPosition.x - 0.7 * heroScale, newPosition.y - 0.1 * heroScale, newPosition.z);
+    const handRPos = new THREE.Vector3(newPosition.x + 0.7 * heroScale, newPosition.y - 0.1 * heroScale, newPosition.z);
 
     // Objects to check for collisions
     const objectsToCheck = [
         { group: trees, scaleFactor: 0.9 },
         { group: rocks, scaleFactor: 0.75 },
-        { group: bushes, scaleFactor: 0.45 }
+        { group: bushes, scaleFactor: 0.45 },
+        { group: enemies, scaleFactor: 2.8 } 
     ];
 
     // Function to check if any body part collides with objects
     const checkPartCollision = (partPos, partRadius) => {
         return objectsToCheck.some(({ group, scaleFactor }) =>
             group.children.some(obj => {
-                const scaledRadius = scaleFactor * obj.scale.x; // Adjust collision radius based on scale
-                return partPos.distanceTo(obj.position) < partRadius + scaledRadius;
+                const objectRadius = scaleFactor * obj.scale.x; // Scale collision radius with size
+                return partPos.distanceTo(obj.position) < partRadius + objectRadius;
             })
         );
     };
 
-    // Check for collisions with the body, shoulders, and hands
+    // Check for collisions with body, shoulders, and hands
     return (
         checkPartCollision(newPosition, bodyRadius) ||
         checkPartCollision(shoulderLPos, shoulderRadius) ||
