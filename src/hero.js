@@ -90,36 +90,28 @@ export class Hero extends THREE.Group {
         if (this.velocity.length() > 0) {
             this.velocity.normalize().multiplyScalar(this.speed);
     
-            // Compute new rotation angle
             const angle = Math.atan2(this.velocity.x, this.velocity.z);
-    
-            // Create target quaternion
             const targetQuaternion = new THREE.Quaternion();
             targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-    
-            // Use quaternion slerp for smooth rotation
             this.quaternion.slerp(targetQuaternion, 0.2);
-
-            // Movement speed factor for animations
-            const movementSpeedFactor = this.velocity.length() / this.speed;
     
-            // Shoulder animation effect
+            const movementSpeedFactor = this.velocity.length() / this.speed;
             const shoulderRotation = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.3 * movementSpeedFactor;
             this.shoulderArmorL.rotation.x = -shoulderRotation;
             this.shoulderArmorR.rotation.x = +shoulderRotation;
-
-            // Hand oscillating motion
+    
             const handOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.4 * movementSpeedFactor;
             this.handL.position.z = 0.1 + handOffset;
             this.handR.position.z = 0.1 - handOffset;
-
-            // Weapon animation
-            const weaponOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.12 * movementSpeedFactor;
-            this.weapon.position.y = weaponOffset;
+        } else {
+            // Smoothly return shoulders and hands to initial positions
+            this.shoulderArmorL.rotation.x = THREE.MathUtils.lerp(this.shoulderArmorL.rotation.x, 0, 0.1);
+            this.shoulderArmorR.rotation.x = THREE.MathUtils.lerp(this.shoulderArmorR.rotation.x, 0, 0.1);
+            this.handL.position.z = THREE.MathUtils.lerp(this.handL.position.z, 0.1, 0.1);
+            this.handR.position.z = THREE.MathUtils.lerp(this.handR.position.z, 0.1, 0.1);
         }
     
         const newPosition = this.position.clone().add(this.velocity);
-    
         if (!this.checkCollision(newPosition)) {
             this.position.copy(newPosition);
         }
