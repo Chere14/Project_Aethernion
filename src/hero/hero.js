@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Weapon } from '../weapon.js';
+import { Weapon } from './weapon.js';
 import { checkCollision } from './collision.js';
 
 export class Hero extends THREE.Group {
