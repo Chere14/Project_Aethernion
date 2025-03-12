@@ -15,7 +15,7 @@ export class World extends THREE.Group {
         this.rockCount = 400;
         this.bushCount = 300;
         this.edgeMargin = 2;
-        this.minDistance = 2;
+        this.minDistance = 6;
         this.safeRadius = 5;
 
         this.trees = new THREE.Group();

@@ -22,7 +22,7 @@ export class Hero extends THREE.Group {
         this.add(body, top, bottom, this.weapon);
          
 
-        // Create shoulder armor boxes
+        // Shoulder armor boxes
         const armorMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
         this.shoulderArmorL = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.6), armorMaterial);
         this.shoulderArmorR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.6), armorMaterial);
@@ -31,7 +31,7 @@ export class Hero extends THREE.Group {
         this.shoulderArmorL.position.set(-0.9, 0.55, 0);
         this.shoulderArmorR.position.set(0.9, 0.55, 0);
 
-        // Create hand spheres
+        // Hand spheres
         const handMaterial = new THREE.MeshStandardMaterial({ color: 0xffaa00 });
         this.handL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), handMaterial);
         this.handR = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), handMaterial);
@@ -103,34 +103,34 @@ export class Hero extends THREE.Group {
         if (this.weaponDrawn) {
             this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
         }
-
+    
         const cameraDirection = new THREE.Vector3();
         this.camera.getWorldDirection(cameraDirection);
         cameraDirection.y = 0;
         cameraDirection.normalize();
-
+    
         const rightDirection = new THREE.Vector3().crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0)).normalize();
-
+    
         this.velocity.set(0, 0, 0);
-
+    
         if (this.keys.w) this.velocity.add(cameraDirection);
         if (this.keys.s) this.velocity.sub(cameraDirection);
         if (this.keys.a) this.velocity.sub(rightDirection);
         if (this.keys.d) this.velocity.add(rightDirection);
-
+    
         if (this.velocity.length() > 0) {
             this.velocity.normalize().multiplyScalar(this.speed);
-
+    
             const angle = Math.atan2(this.velocity.x, this.velocity.z);
             const targetQuaternion = new THREE.Quaternion();
             targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
             this.quaternion.slerp(targetQuaternion, 0.2);
-
+    
             const movementSpeedFactor = this.velocity.length() / this.speed;
             const shoulderRotation = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.3 * movementSpeedFactor;
             this.shoulderArmorL.rotation.x = +shoulderRotation;
             this.shoulderArmorR.rotation.x = -shoulderRotation;
-
+    
             const handOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.2 * movementSpeedFactor;
             this.handL.position.z = 0.1 + handOffset;
             this.handR.position.z = 0.1 - handOffset;
@@ -141,11 +141,12 @@ export class Hero extends THREE.Group {
             this.handL.position.z = THREE.MathUtils.lerp(this.handL.position.z, 0.1, 0.1);
             this.handR.position.z = THREE.MathUtils.lerp(this.handR.position.z, 0.1, 0.1);
         }
-
+    
         const newPosition = this.position.clone().add(this.velocity);
-        
-        // Use the imported collision function
-        if (!checkCollision(newPosition, this.world)) {
+    
+        // Pass hero's scale to the collision function
+        const heroScale = this.scale.x; // Assuming uniform scaling
+        if (!checkCollision(newPosition, this.world, heroScale)) {
             this.position.copy(newPosition);
         }
     }
