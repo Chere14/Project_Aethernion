@@ -15,8 +15,8 @@ export class World extends THREE.Group {
         this.rockCount = 400;
         this.bushCount = 300;
         this.edgeMargin = 2;
-        this.minDistance = 6;
-        this.safeRadius = 5;
+        this.minDistance = 6; // Minimum distance between objects
+        this.safeRadius = 5; // Safe radius from the origin
 
         this.trees = new THREE.Group();
         this.rocks = new THREE.Group();
@@ -61,6 +61,7 @@ export class World extends THREE.Group {
         this.add(this.terrain);
     }
 
+    // Generate random position for objects
     getRandomPosition() {
         let position;
         let attempts = 0;
@@ -76,12 +77,14 @@ export class World extends THREE.Group {
         return position;
     }
 
+    // Check if object is in a safe radius from the origin (center of the world)
     isInSafeZone(position) {
         return position.length() < this.safeRadius;
     }
 
+    // Validate the position ensuring the distance between objects is sufficient
     isValidPosition(newPos, objectScale, baseRadius) {
-        const scaledMinDist = baseRadius * objectScale; // Scale collision range
+        const scaledMinDist = this.minDistance * objectScale; // Scale collision range based on object size
         return this.#objectPositions.every(pos => newPos.distanceTo(pos) >= scaledMinDist);
     }
 
@@ -90,26 +93,26 @@ export class World extends THREE.Group {
             let position;
             let attempts = 0;
             let scale;
-    
+
             do {
                 position = this.getRandomPosition();
                 scale = THREE.MathUtils.randFloat(0.7, 1.5); // Randomize object size
                 attempts++;
             } while ((!this.isValidPosition(position, scale, baseRadius) || this.isInSafeZone(position)) && attempts < 100);
-    
-            if (attempts >= 100) continue; // Avoid infinite loops
-    
+
+            if (attempts >= 100) continue; // Avoid infinite loops if unable to find a valid spot
+
             // Create object and apply random scaling
             const object = new ObjectClass();
             object.scale.set(scale, scale, scale);
-    
+
             // Adjust position
-            position.y = object.position.y || 0;
+            position.y = object.position.y || 0; // Ensure it has a proper Y position
             object.position.copy(position);
-    
+
             // Add to world
             group.add(object);
-            this.#objectPositions.push(position.clone());
+            this.#objectPositions.push(position.clone()); // Store the position for future checks
         }
-    }   
+    }
 }
