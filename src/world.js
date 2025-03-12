@@ -26,7 +26,7 @@ export class World extends THREE.Group {
     generate() {
         this.clear();
         this.createTerrain();
-        this.placeObjects(this.trees, this.treeCount, 0.6, new THREE.ConeGeometry(0.5, 3, 12), 1.5, 0x305010);
+        this.placeObjects(this.trees, this.treeCount, 0.6, new THREE.ConeGeometry(2, 10, 12), 1.5, 0x305010);
         this.placeObjects(this.rocks, this.rockCount, 0.5, new THREE.SphereGeometry(0.5, 12, 12), 0, 0xb0b0b0);
         this.placeObjects(this.bushes, this.bushCount, 0.4, new THREE.SphereGeometry(0.3, 12, 12), 0.3, 0x80a040);
     }

@@ -170,9 +170,9 @@ export class Hero extends THREE.Group {
 
         // Objects to check for collisions
         const objectsToCheck = [
-            { group: trees, radius: 0.6 },
-            { group: rocks, radius: 0.9 },
-            { group: bushes, radius: 0.55 }
+            { group: trees, radius: 0.9 },
+            { group: rocks, radius: 0.75 },
+            { group: bushes, radius: 0.45 }
         ];
 
         // Function to check if any body part collides with objects
