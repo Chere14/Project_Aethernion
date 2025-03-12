@@ -4,15 +4,19 @@ export class Weapon extends THREE.Group {
     constructor() {
         super();
 
-        // Create weapon geometry (a long parallelepiped)
-        const weaponGeometry = new THREE.CylinderGeometry(0.12, 0.12, 2); // Thin, long shape
-        const weaponMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
-        this.weaponMesh = new THREE.Mesh(weaponGeometry, weaponMaterial);
+        // Create handle (cylinder)
+        const handleGeometry = new THREE.CylinderGeometry(0.12, 0.12, 2);
+        const handleMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
+        this.handle = new THREE.Mesh(handleGeometry, handleMaterial);
 
-        // Position of the weapon
-        this.weaponMesh.position.set(0, 0.5, -0.65); 
-        this.weaponMesh.rotation.set(0, 0, Math.PI / 6); 
+        // Create hammerhead (box)
+        const headGeometry = new THREE.BoxGeometry(1, 0.5, 0.5);
+        const headMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
+        this.head = new THREE.Mesh(headGeometry, headMaterial);
 
-        this.add(this.weaponMesh);
+        // Position the head at one end of the handle
+        this.head.position.set(0, -1, 0);
+
+        this.add(this.handle, this.head);
     }
 }

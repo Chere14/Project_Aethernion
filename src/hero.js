@@ -15,11 +15,11 @@ export class Hero extends THREE.Group {
         top.position.y = 1;
         bottom.position.y = -1;
 
-        // Weapon 
-        this.weapon = new Weapon(); 
-        this.add(body, top, bottom, this.weapon);
+        this.weapon = new Weapon();
+        this.attachWeaponToBack();
 
-        this.rotation.y = Math.PI;
+        this.add(body, top, bottom, this.weapon);
+         
 
         // Create shoulder armor boxes
         const armorMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
@@ -36,11 +36,13 @@ export class Hero extends THREE.Group {
         this.handR = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), handMaterial);
 
         // Hand positions
-        this.handL.position.set(-0.8, -0.15, 0);
-        this.handR.position.set(0.8, -0.15, 0);
+        this.handL.position.set(0.8, -0.15, 0);
+        this.handR.position.set(-0.8, -0.15, 0);
         
         this.add(body, top, bottom, this.shoulderArmorL, this.shoulderArmorR, this.handL, this.handR);
-        this.position.set(0, 1, 0);
+        this.position.set(0, 1, 0)
+        //Rotation of all geometry that 
+        this.rotation.y = Math.PI;
 
         // Movement settings
         this.speed = 0.04;
@@ -58,6 +60,11 @@ export class Hero extends THREE.Group {
     initControls() {
         window.addEventListener('keydown', (e) => this.handleKey(e, true));
         window.addEventListener('keyup', (e) => this.handleKey(e, false));
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'z') {
+                this.toggleWeapon();
+            }
+        });
     }
 
     handleKey(event, isPressed) {
@@ -67,10 +74,33 @@ export class Hero extends THREE.Group {
         }
     }
 
+    toggleWeapon() {
+        this.weaponDrawn = !this.weaponDrawn;
+        if (this.weaponDrawn) {
+            this.attachWeaponToHand();
+        } else {
+            this.attachWeaponToBack();
+        }
+    }
+
+    attachWeaponToBack() {
+        this.weapon.position.set(0, 0.8, -0.8);
+        this.weapon.rotation.set(0, 0, 20 * (Math.PI / 180));
+    }
+
+    attachWeaponToHand() {
+        this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
+        this.weapon.rotation.set(Math.PI / 2, Math.PI / 2, 5 * Math.PI / 6);
+    }
+
     update(deltaTime) {
         if (!this.camera) {
             console.error('Camera is not assigned to the character');
             return;
+        }
+
+        if (this.weaponDrawn) {
+            this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
         }
     
         const cameraDirection = new THREE.Vector3();
@@ -97,10 +127,10 @@ export class Hero extends THREE.Group {
     
             const movementSpeedFactor = this.velocity.length() / this.speed;
             const shoulderRotation = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.3 * movementSpeedFactor;
-            this.shoulderArmorL.rotation.x = -shoulderRotation;
-            this.shoulderArmorR.rotation.x = +shoulderRotation;
+            this.shoulderArmorL.rotation.x = +shoulderRotation;
+            this.shoulderArmorR.rotation.x = -shoulderRotation;
     
-            const handOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.4 * movementSpeedFactor;
+            const handOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.2 * movementSpeedFactor;
             this.handL.position.z = 0.1 + handOffset;
             this.handR.position.z = 0.1 - handOffset;
         } else {
