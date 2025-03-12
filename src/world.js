@@ -13,7 +13,7 @@ export class World extends THREE.Group {
         this.bushCount = 300;
         this.edgeMargin = 2; // Prevent objects from spawning too close to edges
         this.minDistance = 2; // Minimum distance between objects
-        this.safeRadius = 3; // Safe zone radius around the origin to prevent objects from blocking the character
+        this.safeRadius = 5; // Safe zone radius around the origin to prevent objects from blocking the character
 
         this.trees = new THREE.Group();
         this.rocks = new THREE.Group();
