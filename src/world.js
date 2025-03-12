@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { Tree } from './objects/tree.js';
+import { Rock } from './objects/rock.js';
+import { Bush } from './objects/bush.js';
 
 export class World extends THREE.Group {
     #objectPositions = [];
@@ -11,9 +14,9 @@ export class World extends THREE.Group {
         this.treeCount = 600;
         this.rockCount = 400;
         this.bushCount = 300;
-        this.edgeMargin = 2; // Prevent objects from spawning too close to edges
-        this.minDistance = 2; // Minimum distance between objects
-        this.safeRadius = 5; // Safe zone radius around the origin to prevent objects from blocking the character
+        this.edgeMargin = 2;
+        this.minDistance = 2;
+        this.safeRadius = 5;
 
         this.trees = new THREE.Group();
         this.rocks = new THREE.Group();
@@ -26,9 +29,9 @@ export class World extends THREE.Group {
     generate() {
         this.clear();
         this.createTerrain();
-        this.placeObjects(this.trees, this.treeCount, 0.6, new THREE.ConeGeometry(2, 10, 12), 1.5, 0x305010);
-        this.placeObjects(this.rocks, this.rockCount, 0.5, new THREE.SphereGeometry(0.5, 12, 12), 0, 0xb0b0b0);
-        this.placeObjects(this.bushes, this.bushCount, 0.4, new THREE.SphereGeometry(0.3, 12, 12), 0.3, 0x80a040);
+        this.placeObjects(this.trees, this.treeCount, Tree, 0.9);
+        this.placeObjects(this.rocks, this.rockCount, Rock, 0.75);
+        this.placeObjects(this.bushes, this.bushCount, Bush, 0.45);
     }
 
     clear() {
@@ -40,8 +43,8 @@ export class World extends THREE.Group {
 
         [this.trees, this.rocks, this.bushes].forEach(group => {
             group.children.forEach(obj => {
-                obj.geometry?.dispose();
-                obj.material?.dispose();
+                obj.geometry.dispose();
+                obj.material.dispose();
             });
             group.clear();
         });
@@ -77,28 +80,36 @@ export class World extends THREE.Group {
         return position.length() < this.safeRadius;
     }
 
-    isValidPosition(newPos, minDist) {
-        return this.#objectPositions.every(pos => newPos.distanceTo(pos) >= minDist);
+    isValidPosition(newPos, objectScale, baseRadius) {
+        const scaledMinDist = baseRadius * objectScale; // Scale collision range
+        return this.#objectPositions.every(pos => newPos.distanceTo(pos) >= scaledMinDist);
     }
 
-    placeObjects(group, count, radius, geometry, yOffset, color) {
-        const material = new THREE.MeshStandardMaterial({ color, flatShading: true });
-
+    placeObjects(group, count, ObjectClass, baseRadius) {
         for (let i = 0; i < count; i++) {
             let position;
             let attempts = 0;
+            let scale;
+    
             do {
                 position = this.getRandomPosition();
+                scale = THREE.MathUtils.randFloat(0.7, 1.5); // Randomize object size
                 attempts++;
-            } while ((!this.isValidPosition(position, this.minDistance) || this.isInSafeZone(position)) && attempts < 100);
-
+            } while ((!this.isValidPosition(position, scale, baseRadius) || this.isInSafeZone(position)) && attempts < 100);
+    
             if (attempts >= 100) continue; // Avoid infinite loops
-
-            position.y = yOffset;
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.copy(position);
-            group.add(mesh);
+    
+            // Create object and apply random scaling
+            const object = new ObjectClass();
+            object.scale.set(scale, scale, scale);
+    
+            // Adjust position
+            position.y = object.position.y || 0;
+            object.position.copy(position);
+    
+            // Add to world
+            group.add(object);
             this.#objectPositions.push(position.clone());
         }
-    }
+    }   
 }

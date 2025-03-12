@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { World } from './world';
-import { Hero } from './hero.js';
+import { Hero } from './hero/hero.js';
 
 // GUI and Stats
 const gui = new GUI();

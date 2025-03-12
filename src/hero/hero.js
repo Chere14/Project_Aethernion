@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { Weapon } from './weapon';
+import { Weapon } from '../weapon.js';
+import { checkCollision } from './collision.js';
 
 export class Hero extends THREE.Group {
     constructor(world, camera) {
@@ -102,34 +103,34 @@ export class Hero extends THREE.Group {
         if (this.weaponDrawn) {
             this.weapon.position.copy(this.handR.position.clone().add(new THREE.Vector3(0, 0.1, 0.2)));
         }
-    
+
         const cameraDirection = new THREE.Vector3();
         this.camera.getWorldDirection(cameraDirection);
         cameraDirection.y = 0;
         cameraDirection.normalize();
-    
+
         const rightDirection = new THREE.Vector3().crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0)).normalize();
-    
+
         this.velocity.set(0, 0, 0);
-    
+
         if (this.keys.w) this.velocity.add(cameraDirection);
         if (this.keys.s) this.velocity.sub(cameraDirection);
         if (this.keys.a) this.velocity.sub(rightDirection);
         if (this.keys.d) this.velocity.add(rightDirection);
-    
+
         if (this.velocity.length() > 0) {
             this.velocity.normalize().multiplyScalar(this.speed);
-    
+
             const angle = Math.atan2(this.velocity.x, this.velocity.z);
             const targetQuaternion = new THREE.Quaternion();
             targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
             this.quaternion.slerp(targetQuaternion, 0.2);
-    
+
             const movementSpeedFactor = this.velocity.length() / this.speed;
             const shoulderRotation = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.3 * movementSpeedFactor;
             this.shoulderArmorL.rotation.x = +shoulderRotation;
             this.shoulderArmorR.rotation.x = -shoulderRotation;
-    
+
             const handOffset = Math.sin(performance.now() * 0.005 * movementSpeedFactor) * 0.2 * movementSpeedFactor;
             this.handL.position.z = 0.1 + handOffset;
             this.handR.position.z = 0.1 - handOffset;
@@ -140,55 +141,12 @@ export class Hero extends THREE.Group {
             this.handL.position.z = THREE.MathUtils.lerp(this.handL.position.z, 0.1, 0.1);
             this.handR.position.z = THREE.MathUtils.lerp(this.handR.position.z, 0.1, 0.1);
         }
-    
+
         const newPosition = this.position.clone().add(this.velocity);
-        if (!this.checkCollision(newPosition)) {
+        
+        // Use the imported collision function
+        if (!checkCollision(newPosition, this.world)) {
             this.position.copy(newPosition);
         }
-    }
-
-    checkCollision(newPosition) {
-        const { width, height, edgeMargin, trees, rocks, bushes } = this.world;
-        const halfWidth = width / 2 - edgeMargin;
-        const halfHeight = height / 2 - edgeMargin;
-
-        // Prevent moving outside the world bounds
-        if (Math.abs(newPosition.x) > halfWidth || Math.abs(newPosition.z) > halfHeight) {
-            return true;
-        }
-
-        // Define bounding spheres for each part
-        const bodyRadius = 0.5;
-        const shoulderRadius = 0.25;
-        const handRadius = 0.15;
-
-        // Positions of additional body parts
-        const shoulderLPos = new THREE.Vector3(newPosition.x - 0.7, newPosition.y + 0.4, newPosition.z);
-        const shoulderRPos = new THREE.Vector3(newPosition.x + 0.7, newPosition.y + 0.4, newPosition.z);
-        const handLPos = new THREE.Vector3(newPosition.x - 0.7, newPosition.y - 0.1, newPosition.z);
-        const handRPos = new THREE.Vector3(newPosition.x + 0.7, newPosition.y - 0.1, newPosition.z);
-
-        // Objects to check for collisions
-        const objectsToCheck = [
-            { group: trees, radius: 0.9 },
-            { group: rocks, radius: 0.75 },
-            { group: bushes, radius: 0.45 }
-        ];
-
-        // Function to check if any body part collides with objects
-        const checkPartCollision = (partPos, partRadius) => {
-            return objectsToCheck.some(({ group, radius }) =>
-                group.children.some(obj => partPos.distanceTo(obj.position) < partRadius + radius)
-            );
-        };
-
-        // Check for collisions with the body, shoulders, and hands
-        return (
-            checkPartCollision(newPosition, bodyRadius) ||
-            checkPartCollision(shoulderLPos, shoulderRadius) ||
-            checkPartCollision(shoulderRPos, shoulderRadius) ||
-            checkPartCollision(handLPos, handRadius) ||
-            checkPartCollision(handRPos, handRadius)
-        );
     }
 }
