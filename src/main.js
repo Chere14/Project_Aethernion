@@ -6,7 +6,7 @@ import { World } from './world';
 import { Hero } from './hero/hero.js';
 
 // GUI and Stats
-const gui = new GUI();
+// const gui = new GUI();
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -67,6 +67,6 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// GUI
-const worldFolder = gui.addFolder('World');
-worldFolder.add(world, 'generate').name('Generate');
+// // GUI
+// const worldFolder = gui.addFolder('World');
+// worldFolder.add(world, 'generate').name('Generate');
