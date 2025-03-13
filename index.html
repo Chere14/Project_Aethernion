@@ -50,17 +50,76 @@
 				background-color: rgba(0, 0, 0, 0.8);
 			}
 
+			#damageDisplay {
+				position: absolute;
+				color: white;
+				background-color: rgba(0, 0, 0, 0.7);
+				padding: 5px 10px;
+				border-radius: 5px;
+				font-family: Arial, sans-serif;
+				font-size: 16px;
+				display: none;
+				left: 800px;
+				top: 600px;
+			}
+
+			#target-bar {
+				position: absolute;
+				top: 10px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 300px;
+				background-color: rgba(0, 0, 0, 0.8);
+				padding: 10px;
+				border-radius: 5px;
+				color: white;
+				font-family: Arial, sans-serif;
+				font-size: 16px;
+				display: none;
+			}
+
+			#target-bar .target-name {
+				text-align: center;
+			}
+
+			#target-bar .health-bar-container {
+				width: 100%;
+				height: 20px;
+				background-color: #333;
+				border-radius: 3px;
+				overflow: hidden;
+			}
+
+			#target-bar .health-bar {
+				width: 100%; 
+				height: 100%;
+				background-color: red;
+			}
+
+			#target-bar .health-text {
+				text-align: center;
+				margin-top: 5px;
+			}
+
 		</style>
 	</head>
 	<body>
 
-		<script type="module" src="/src/main.js"></script>
 		<a class="UI">
 			<div id="skillBar"></div>
 			<div id="statsBar"></div>
 			<div id="menuBar"></div>
 			<div id="map"></div>
+			<div id="damageDisplay"></div>
+			<div id="target-bar">
+				<div class="target-name"></div>
+				<div class="health-bar-container">
+					<div class="health-bar"></div>
+				</div>
+				<div class="health-text"></div>
+			</div>
 		</a>
+		<script type="module" src="/src/main.js"></script>
 
 	</body>
 </html>

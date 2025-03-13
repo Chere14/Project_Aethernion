@@ -18,5 +18,8 @@ export class Weapon extends THREE.Group {
         this.head.position.set(0, -1, 0);
 
         this.add(this.handle, this.head);
+
+        // Weapon stats
+        this.attackPowerBoost = 20; 
     }
 }

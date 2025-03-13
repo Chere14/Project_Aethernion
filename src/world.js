@@ -6,7 +6,7 @@ import { Enemy } from './objects/enemy.js';
 
 export class World extends THREE.Group {
     #objectPositions = [];
-    #enemyPositions = []; // Store enemy positions to prevent objects spawning nearby
+    #enemyPositions = [];
 
     constructor() {
         super();
@@ -16,11 +16,11 @@ export class World extends THREE.Group {
         this.treeCount = 600;
         this.rockCount = 400;
         this.bushCount = 300;
-        this.enemyCount = 10; // Number of enemies
+        this.enemyCount = 10;
         this.edgeMargin = 2;
-        this.minDistance = 6; // Minimum distance between objects
-        this.enemyBufferZone = 12; // Space around enemies
-        this.safeRadius = 5; // Safe radius from center
+        this.minDistance = 6;
+        this.enemyBufferZone = 12;
+        this.safeRadius = 5;
 
         this.trees = new THREE.Group();
         this.rocks = new THREE.Group();
@@ -34,7 +34,7 @@ export class World extends THREE.Group {
     generate() {
         this.clear();
         this.createTerrain();
-        this.placeEnemies(); 
+        this.placeEnemies();
         this.placeObjects(this.trees, this.treeCount, Tree, 0.9);
         this.placeObjects(this.rocks, this.rockCount, Rock, 0.75);
         this.placeObjects(this.bushes, this.bushCount, Bush, 0.45);
@@ -56,7 +56,7 @@ export class World extends THREE.Group {
         });
 
         this.#objectPositions = [];
-        this.#enemyPositions = []; // Reset enemy positions
+        this.#enemyPositions = [];
     }
 
     createTerrain() {
@@ -94,7 +94,7 @@ export class World extends THREE.Group {
     isValidPosition(newPos, objectScale) {
         const scaledMinDist = this.minDistance * objectScale;
         return this.#objectPositions.every(pos => newPos.distanceTo(pos) >= scaledMinDist) &&
-               !this.isTooCloseToEnemies(newPos); // Ensure objects are not near enemies
+               !this.isTooCloseToEnemies(newPos);
     }
 
     placeEnemies() {
@@ -107,14 +107,14 @@ export class World extends THREE.Group {
                 attempts++;
             } while ((this.isTooCloseToEnemies(position) || this.isInSafeZone(position)) && attempts < 100);
 
-            if (attempts >= 100) continue; 
+            if (attempts >= 100) continue;
 
             const enemy = new Enemy();
-            enemy.scale.set(1.5, 1.5, 1.5); // Adjust enemy size
+            enemy.scale.set(1.5, 1.5, 1.5);
             enemy.position.copy(position);
 
             this.enemies.add(enemy);
-            this.#enemyPositions.push(position.clone()); // Store enemy position
+            this.#enemyPositions.push(position.clone());
         }
     }
 
@@ -126,19 +126,25 @@ export class World extends THREE.Group {
 
             do {
                 position = this.getRandomPosition();
-                scale = THREE.MathUtils.randFloat(0.7, 1.5); // Randomize size
+                scale = THREE.MathUtils.randFloat(0.7, 1.5);
                 attempts++;
             } while ((!this.isValidPosition(position, scale) || this.isInSafeZone(position)) && attempts < 100);
 
-            if (attempts >= 100) continue; 
+            if (attempts >= 100) continue;
 
             const object = new ObjectClass();
             object.scale.set(scale, scale, scale);
-            position.y = object.position.y || 0; 
+            position.y = object.position.y || 0;
             object.position.copy(position);
 
             group.add(object);
             this.#objectPositions.push(position.clone());
         }
+    }
+
+    update() {
+        // Remove dead enemies
+        this.enemies.children = this.enemies.children.filter(enemy => enemy.isAlive);
+        // Update enemy positions array if needed 
     }
 }
