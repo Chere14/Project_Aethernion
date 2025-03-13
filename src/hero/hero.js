@@ -23,23 +23,19 @@ export class Hero extends THREE.Group {
 
         this.add(body, top, bottom, this.weapon);
 
-        // Stats
         this.health = 100;
         this.baseAttackPower = 10;
-        this.attackPower = this.baseAttackPower; // Initialize without boost
+        this.attackPower = this.baseAttackPower;
+        this.attackRange = 7;
 
-        // Initialize the attack controller
         this.heroAttack = new HeroAttack(this, world);
 
-        // Shoulder armor boxes
         const armorMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
         this.shoulderArmorL = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.6), armorMaterial);
         this.shoulderArmorR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.6), armorMaterial);
-
         this.shoulderArmorL.position.set(-0.9, 0.55, 0);
         this.shoulderArmorR.position.set(0.9, 0.55, 0);
 
-        // Hand spheres
         const handMaterial = new THREE.MeshStandardMaterial({ color: 0xffaa00 });
         this.handL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), handMaterial);
         this.handR = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), handMaterial);
@@ -51,12 +47,10 @@ export class Hero extends THREE.Group {
         this.position.set(0, 1, 0);
         this.rotation.y = Math.PI;
 
-        // Movement settings
         this.speed = 0.04;
         this.velocity = new THREE.Vector3();
         this.keys = { w: false, a: false, s: false, d: false };
 
-        // Animation properties
         this.shoulderAnimationTime = 0;
         this.shoulderAmplitude = 0.08;
         this.shoulderFrequency = 0.08;
@@ -96,24 +90,24 @@ export class Hero extends THREE.Group {
         if (this.weaponDrawn) {
             this.attachWeaponToHand();
             this.attackPower = this.baseAttackPower + this.weapon.attackPowerBoost;
-            console.log(`Weapon drawn. Attack Power: ${this.attackPower}`);
+            console.log(`Weapon drawn. Attack Power: ${this.attackPower}, Range: ${this.attackRange}`);
         } else {
             this.attachWeaponToBack();
             this.attackPower = this.baseAttackPower;
-            console.log(`Weapon sheathed. Attack Power: ${this.attackPower}`);
+            console.log(`Weapon sheathed. Attack Power: ${this.attackPower}, Range: ${this.attackRange}`);
         }
     }
 
     attachWeaponToBack() {
         this.weaponDrawn = false;
-        this.attackPower = this.baseAttackPower; // Ensure reset
+        this.attackPower = this.baseAttackPower;
         this.weapon.position.set(0, 0.8, -0.8);
         this.weapon.rotation.set(0, 0, 20 * (Math.PI / 180));
     }
 
     attachWeaponToHand() {
         this.weaponDrawn = true;
-        this.attackPower = this.baseAttackPower + this.weapon.attackPowerBoost; // Ensure boost applied
+        this.attackPower = this.baseAttackPower + this.weapon.attackPowerBoost;
         const handPosition = this.handR.position.clone();
         const offsetX = 0;
         const offsetY = 0.1;
@@ -171,8 +165,11 @@ export class Hero extends THREE.Group {
 
         const newPosition = this.position.clone().add(this.velocity);
         const heroScale = this.scale.x;
-        if (!checkCollision(newPosition, this.world, heroScale)) {
+
+        if (!checkCollision(newPosition, this.world, heroScale) && !this.world.checkEnemyCollision(newPosition, heroScale)) {
             this.position.copy(newPosition);
+        } else {
+            console.log('Hero movement blocked by collision');
         }
     }
 }

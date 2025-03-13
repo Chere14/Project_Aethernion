@@ -49,8 +49,8 @@ export class World extends THREE.Group {
 
         [this.trees, this.rocks, this.bushes, this.enemies].forEach(group => {
             group.children.forEach(obj => {
-                obj.geometry.dispose();
-                obj.material.dispose();
+                if (obj.geometry) obj.geometry.dispose();
+                if (obj.material) obj.material.dispose();
             });
             group.clear();
         });
@@ -110,7 +110,7 @@ export class World extends THREE.Group {
             if (attempts >= 100) continue;
 
             const enemy = new Enemy();
-            enemy.scale.set(1.5, 1.5, 1.5);
+            enemy.setScale(1.5); // Adjusts attack range to 4.5
             enemy.position.copy(position);
 
             this.enemies.add(enemy);
@@ -142,9 +142,24 @@ export class World extends THREE.Group {
         }
     }
 
-    update() {
-        // Remove dead enemies
+    update(hero) {
         this.enemies.children = this.enemies.children.filter(enemy => enemy.isAlive);
-        // Update enemy positions array if needed 
+        this.enemies.children.forEach(enemy => enemy.update(hero));
+    }
+
+    checkEnemyCollision(position, heroScale) {
+        for (const enemy of this.enemies.children) {
+            if (!enemy.isAlive) continue;
+            const enemyPos = enemy.position.clone();
+            const enemyRadius = enemy.body.geometry.parameters.radius * enemy.scale.x; // 4.5 with scale 1.5
+            const heroRadius = heroScale * 0.5; // Hero radius 0.5
+            const distance = position.distanceTo(enemyPos);
+            const minDistance = enemyRadius + heroRadius; // ~5 units
+            if (distance < minDistance) {
+                console.log(`Collision with enemy at ${distance.toFixed(2)} < ${minDistance.toFixed(2)}`);
+                return true;
+            }
+        }
+        return false;
     }
 }

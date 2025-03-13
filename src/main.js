@@ -70,21 +70,58 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     targetName.textContent = 'Enemy';
-    const healthBarContainer = targetBar.querySelector('.health-bar-container');
-    if (!healthBarContainer) {
+    const targetHealthBarContainer = targetBar.querySelector('.health-bar-container');
+    if (!targetHealthBarContainer) {
         console.error('Health bar container not found!');
         return;
     }
-    const healthBar = healthBarContainer.querySelector('.health-bar');
-    if (!healthBar) {
+    const targetHealthBar = targetHealthBarContainer.querySelector('.health-bar');
+    if (!targetHealthBar) {
         console.error('Health bar not found!');
         return;
     }
-    const healthText = targetBar.querySelector('.health-text');
-    if (!healthText) {
+    const targetHealthText = targetBar.querySelector('.health-text');
+    if (!targetHealthText) {
         console.error('Health text not found!');
         return;
     }
+
+    // Hero Health Bar Setup
+    const heroHealthBar = document.getElementById('hero-health-bar');
+    if (!heroHealthBar) {
+        console.error('Hero health bar element not found!');
+        return;
+    }
+    const heroName = heroHealthBar.querySelector('.hero-name');
+    if (!heroName) {
+        console.error('Hero name element not found!');
+        return;
+    }
+    heroName.textContent = 'Hero';
+    const heroHealthBarContainer = heroHealthBar.querySelector('.health-bar-container');
+    if (!heroHealthBarContainer) {
+        console.error('Hero health bar container not found!');
+        return;
+    }
+    const heroHealthBarElement = heroHealthBarContainer.querySelector('.health-bar');
+    if (!heroHealthBarElement) {
+        console.error('Hero health bar not found!');
+        return;
+    }
+    const heroHealthText = heroHealthBar.querySelector('.health-text');
+    if (!heroHealthText) {
+        console.error('Hero health text not found!');
+        return;
+    }
+
+    function updateHeroHealthBar() {
+        const healthPercentage = (hero.health / 100) * 100; // Assuming max health is 100
+        heroHealthBarElement.style.width = `${healthPercentage}%`;
+        heroHealthText.textContent = `Health: ${hero.health}/100`;
+    }
+
+    // Initial health bar update
+    updateHeroHealthBar();
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -92,9 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTargetBar() {
         if (window.selectedEnemy && window.selectedEnemy.isAlive) {
-            const healthPercentage = (window.selectedEnemy.health / 300) * 100;
-            healthBar.style.width = `${healthPercentage}%`;
-            healthText.textContent = `Health: ${window.selectedEnemy.health}`;
+            const healthPercentage = (window.selectedEnemy.health / 300) * 100; // Enemy max health 300
+            targetHealthBar.style.width = `${healthPercentage}%`;
+            targetHealthText.textContent = `Health: ${window.selectedEnemy.health}/300`;
             targetBar.style.display = 'block';
         } else {
             targetBar.style.display = 'none';
@@ -104,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.updateTargetBar = updateTargetBar;
 
-    // Right-click detection
     window.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -122,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Esc key to hide target bar
     window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             window.selectedEnemy = null;
@@ -130,6 +165,22 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Esc pressed: Target bar hidden');
         }
     });
+
+    function respawnHero() {
+        hero.health = 100; // Reset health
+        hero.position.set(0, 1, 0); // Respawn at origin
+        hero.visible = true; // Make visible again
+        updateHeroHealthBar();
+        console.log('Hero respawned at origin');
+    }
+
+    function checkHeroHealth() {
+        if (hero.health <= 0 && hero.visible) {
+            hero.visible = false; // Hide hero
+            console.log('Hero defeated! Respawning in 5 seconds...');
+            setTimeout(respawnHero, 5000); // Respawn after 5 seconds
+        }
+    }
 
     function updateCamera() {
         const targetPosition = new THREE.Vector3(hero.position.x, 20, hero.position.z + 20);
@@ -139,9 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function animate() {
         hero.update();
-        world.update();
+        world.update(hero);
         updateCamera();
         updateTargetBar();
+        updateHeroHealthBar(); // Update hero health bar each frame
+        checkHeroHealth(); // Check for death and respawn
         renderer.render(scene, camera);
         stats.update();
     }

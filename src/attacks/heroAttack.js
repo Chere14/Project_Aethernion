@@ -27,7 +27,7 @@ export class HeroAttack {
         this.swingTime = 0;
         this.hasHit = false;
 
-        console.log(`Starting swing with attack power: ${this.hero.attackPower}`);
+        console.log(`Starting swing with attack power: ${this.hero.attackPower}, range: ${this.hero.attackRange}`);
 
         requestAnimationFrame(() => this.swing());
     }
@@ -35,10 +35,10 @@ export class HeroAttack {
     swing() {
         if (!this.isSwinging) return;
 
-        this.swingTime += 0.05;
+        this.swingTime += 0.03;
 
         const swingAngle = Math.sin(this.swingTime * 0.5 * Math.PI);
-        this.weapon.rotation.set(Math.PI / 2, Math.PI / 2, 5 * Math.PI / 6 + swingAngle);
+        this.weapon.rotation.set(Math.PI / 2, Math.PI / 2, 4 * Math.PI / 5 + swingAngle);
 
         if (!this.hasHit && this.swingTime > 0.3 && this.swingTime < 0.7) {
             this.checkCollisions();
@@ -53,27 +53,25 @@ export class HeroAttack {
     }
 
     checkCollisions() {
-        const weaponWorldPos = new THREE.Vector3();
-        this.weapon.getWorldPosition(weaponWorldPos);
-
-        const weaponRadius = 1.5;
+        const heroPos = this.hero.position.clone(); // Hero's world position
 
         this.world.enemies.children.forEach((enemy) => {
             if (!enemy.isAlive) return;
 
-            const enemyPos = enemy.position;
-            const enemyRadius = 2.8 * enemy.scale.x;
-            const distance = weaponWorldPos.distanceTo(enemyPos);
+            const enemyPos = enemy.position.clone();
+            const distanceToEnemy = heroPos.distanceTo(enemyPos);
 
-            if (distance < weaponRadius + enemyRadius) {
+            // Check if enemy is within attack range
+            if (distanceToEnemy <= this.hero.attackRange) {
                 const damage = this.hero.attackPower;
                 enemy.takeDamage(damage);
                 this.hasHit = true;
-                // Set the selected enemy and update the target bar
-                window.selectedEnemy = enemy; // Use global scope to match main.js
-                window.updateTargetBar(); // Trigger target bar update
-                console.log(`Dealt ${damage} damage to enemy. Enemy health: ${enemy.health}`);
+                window.selectedEnemy = enemy;
+                window.updateTargetBar();
+                console.log(`Hit enemy at ${distanceToEnemy.toFixed(2)} units. Dealt ${damage} damage. Enemy health: ${enemy.health}`);
                 window.showDamageMessage(`Enemy hit! Damage: ${damage}`);
+            } else {
+                console.log(`Enemy at ${distanceToEnemy.toFixed(2)} units is beyond range (${this.hero.attackRange})`);
             }
         });
     }
